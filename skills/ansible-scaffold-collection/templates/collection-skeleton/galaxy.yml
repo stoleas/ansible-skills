@@ -1,0 +1,46 @@
+---
+namespace: [namespace]
+name: [collection_name]
+version: 1.0.0
+readme: README.md
+
+authors:
+  - [Your Name] <[your.email@company.com]>
+
+description: >
+  [Describe what this collection provides - infrastructure automation,
+  cloud management, security hardening, etc.]
+
+license:
+  - MIT
+
+license_file: LICENSE
+
+tags:
+  - [tag1]
+  - [tag2]
+  - [tag3]
+  - automation
+
+dependencies: {}
+  # Example dependencies:
+  # ansible.posix: ">=1.0.0"
+  # community.general: ">=3.0.0"
+
+repository: https://github.com/[organization]/[repository]
+documentation: https://docs.[organization].com/[collection]
+homepage: https://[organization].com
+issues: https://github.com/[organization]/[repository]/issues
+
+build_ignore:
+  - .git
+  - .gitignore
+  - .DS_Store
+  - '*.pyc'
+  - '*.retry'
+  - tests/output
+  - .vscode
+  - .idea
+  - molecule
+  - .ansible-lint
+  - .yamllint

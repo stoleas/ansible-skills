@@ -1,0 +1,35 @@
+---
+# Ansible Collections for Execution Environment
+
+collections:
+  # Core POSIX utilities
+  - name: ansible.posix
+    version: ">=1.5.4"
+
+  # General utilities and modules
+  - name: community.general
+    version: ">=7.0.0"
+
+  # Add cloud providers as needed
+  # - name: amazon.aws
+  #   version: ">=5.0.0"
+
+  # - name: azure.azcollection
+  #   version: ">=1.14.0"
+
+  # - name: google.cloud
+  #   version: ">=1.1.0"
+
+  # Kubernetes/OpenShift
+  # - name: kubernetes.core
+  #   version: ">=2.4.0"
+
+  # Network automation
+  # - name: ansible.netcommon
+  #   version: ">=5.0.0"
+
+  # Custom collections from Git
+  # - name: company.custom_collection
+  #   source: https://github.com/company/custom_collection.git
+  #   type: git
+  #   version: main

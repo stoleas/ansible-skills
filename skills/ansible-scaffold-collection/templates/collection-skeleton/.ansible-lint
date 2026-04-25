@@ -1,0 +1,28 @@
+---
+# ansible-lint configuration for collections
+# Use production profile for strictest validation
+profile: production
+
+exclude_paths:
+  - .git/
+  - .github/
+  - tests/output/
+  - changelogs/
+  - .cache/
+
+kinds:
+  - playbook: "playbooks/*.yml"
+  - playbook: "**/playbooks/*.yml"
+  - tasks: "roles/*/tasks/*.yml"
+  - vars: "roles/*/vars/*.yml"
+  - vars: "roles/*/defaults/*.yml"
+  - meta: "roles/*/meta/main.yml"
+  - yaml: "**/*.yaml"
+  - yaml: "**/*.yml"
+
+# Skip specific rules only when absolutely necessary
+skip_list: []
+  # - yaml[line-length]  # Only if you have legitimate long lines
+
+warn_list:
+  - experimental  # Warn about experimental features

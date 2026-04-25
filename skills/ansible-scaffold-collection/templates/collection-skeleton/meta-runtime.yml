@@ -1,0 +1,21 @@
+---
+# Collection runtime metadata
+requires_ansible: '>=2.11.0'
+
+# Plugin routing (if migrating from older content)
+plugin_routing:
+  modules: {}
+  # Example module redirect:
+  # old_module_name:
+  #   redirect: namespace.collection.new_module_name
+  #   deprecation:
+  #     removal_version: "2.0.0"
+  #     warning_text: Use new_module_name instead
+
+# Action groups for easier module references
+action_groups: {}
+  # Example grouping:
+  # cloud:
+  #   - aws_ec2
+  #   - azure_vm
+  #   - gcp_compute

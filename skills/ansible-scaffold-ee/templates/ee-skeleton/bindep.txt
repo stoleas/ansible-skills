@@ -1,0 +1,34 @@
+# System Dependencies for Execution Environment
+# Format: package_name [platform:distribution version]
+
+# Version control
+git [platform:rpm]
+git [platform:dpkg]
+
+# File synchronization
+rsync [platform:rpm]
+rsync [platform:dpkg]
+
+# SSH client
+openssh-clients [platform:rpm]
+openssh-client [platform:dpkg]
+
+# Password authentication
+sshpass [platform:rpm]
+sshpass [platform:dpkg]
+
+# Development tools (if needed for pip packages)
+# gcc [platform:rpm]
+# gcc [platform:dpkg]
+# python39-devel [platform:centos-8 platform:rhel-8]
+# python3-dev [platform:ubuntu-20.04]
+
+# SSL/TLS
+# ca-certificates [platform:rpm]
+# ca-certificates [platform:dpkg]
+
+# Additional tools
+# curl [platform:rpm]
+# curl [platform:dpkg]
+# wget [platform:rpm]
+# wget [platform:dpkg]

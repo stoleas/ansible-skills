@@ -1,0 +1,56 @@
+---
+# ansible-navigator.yml - CI/CD Configuration
+# Optimized for GitHub Actions, GitLab CI, Jenkins, etc.
+
+ansible-navigator:
+  # Execution environment settings
+  execution-environment:
+    enabled: true
+    image: quay.io/ansible/creator-ee:latest
+    pull:
+      policy: always  # Always pull in CI
+    container-engine: podman
+
+    # CI volume mounts
+    volume-mounts:
+      - src: "{project_dir}"
+        dest: /runner/project
+        options: Z
+
+    # Environment variables from CI
+    environment-variables:
+      pass:
+        - CI
+        - GITHUB_ACTIONS
+        - GITLAB_CI
+        - JENKINS_URL
+        - VAULT_PASSWORD
+
+  # Stdout mode for CI logs
+  mode: stdout
+
+  # Ansible configuration
+  ansible:
+    config: ansible.cfg
+    cmdline: "--forks 10"
+
+  # Playbook artifact configuration
+  playbook-artifact:
+    enable: true
+    save-as: "artifacts/{playbook_name}-{time_stamp}.json"
+
+  # Logging
+  logging:
+    level: info
+    append: false  # Fresh logs for each CI run
+    file: ansible-navigator-ci.log
+
+  # Color settings (some CI systems support color)
+  color:
+    enable: true
+
+  # Format
+  format: yaml
+
+  # Time zone
+  time-zone: UTC

@@ -1,0 +1,56 @@
+# Ansible
+*.retry
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+htmlcov/
+tests/output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Molecule
+molecule/*/.molecule/
+molecule/*/tests/__pycache__/
+
+# Build artifacts
+*.tar.gz
+namespace-*
+
+# Documentation builds
+docs/_build/
+
+# Ansible Galaxy
+.galaxy_install_info

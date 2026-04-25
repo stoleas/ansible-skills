@@ -1,0 +1,57 @@
+---
+# ansible-navigator.yml - Production/CI Configuration
+# Optimized for CI/CD pipelines and production deployments
+
+ansible-navigator:
+  # Execution environment settings
+  execution-environment:
+    enabled: true
+    image: quay.io/myorg/production-ee:1.0.0  # Pin to specific version
+    pull:
+      policy: always  # Always pull latest in production
+    container-engine: podman
+
+    # Production volume mounts
+    volume-mounts:
+      - src: "{project_dir}"
+        dest: /runner/project
+        options: Z
+
+    # Pass sensitive environment variables
+    environment-variables:
+      pass:
+        - VAULT_PASSWORD
+        - AWS_ACCESS_KEY_ID
+        - AWS_SECRET_ACCESS_KEY
+        - ANSIBLE_VAULT_PASSWORD_FILE
+
+  # Stdout mode for CI/CD
+  mode: stdout
+
+  # Ansible configuration
+  ansible:
+    config: ansible.cfg
+    cmdline: "--forks 20"  # Parallel execution for production
+    inventories:
+      - inventory/production
+
+  # Playbook artifact configuration
+  playbook-artifact:
+    enable: true
+    save-as: "artifacts/{playbook_name}-{time_stamp}.json"
+
+  # Logging
+  logging:
+    level: warning  # Reduce noise in production
+    append: true
+    file: /var/log/ansible-navigator.log
+
+  # Color settings
+  color:
+    enable: true
+
+  # Format
+  format: yaml
+
+  # Time zone
+  time-zone: UTC

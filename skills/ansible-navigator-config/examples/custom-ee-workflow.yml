@@ -1,0 +1,78 @@
+---
+# Custom Execution Environment Workflow Example
+# Demonstrates using a custom EE with specific collections and dependencies
+
+ansible-navigator:
+  execution-environment:
+    enabled: true
+    image: quay.io/myorg/custom-ansible-ee:2.0.0
+
+    pull:
+      policy: missing
+      arguments:
+        - "--tls-verify=false"  # For internal registries
+
+    container-engine: podman
+
+    # Container options
+    container-options:
+      - "--net=host"  # Use host networking
+      - "--cap-add=NET_ADMIN"  # If network operations needed
+
+    # Mount custom directories
+    volume-mounts:
+      # Project
+      - src: "{project_dir}"
+        dest: /runner/project
+        options: Z
+
+      # Custom collections
+      - src: ~/.ansible/collections
+        dest: /runner/collections
+        options: ro,Z
+
+      # Custom roles
+      - src: ~/ansible-roles
+        dest: /runner/roles
+        options: ro,Z
+
+      # SSH keys
+      - src: ~/.ssh
+        dest: /home/runner/.ssh
+        options: ro,Z
+
+      # Vault password file
+      - src: ~/.vault_pass
+        dest: /runner/.vault_pass
+        options: ro,Z
+
+    # Environment variables
+    environment-variables:
+      set:
+        ANSIBLE_VAULT_PASSWORD_FILE: /runner/.vault_pass
+        ANSIBLE_FORCE_COLOR: "true"
+        ANSIBLE_CONFIG: /runner/project/ansible.cfg
+        CUSTOM_API_ENDPOINT: "https://api.example.com"
+      pass:
+        - HTTP_PROXY
+        - HTTPS_PROXY
+        - NO_PROXY
+        - AWS_PROFILE
+
+  # Mode
+  mode: interactive
+
+  # Ansible settings
+  ansible:
+    config: ansible.cfg
+    cmdline: "--forks 15 --timeout 60"
+
+  # Artifacts
+  playbook-artifact:
+    enable: true
+    save-as: "artifacts/{playbook_name}-{time_stamp}.json"
+
+  # Logging
+  logging:
+    level: debug
+    file: navigator-custom-ee.log

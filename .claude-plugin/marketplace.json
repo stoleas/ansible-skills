@@ -1,0 +1,23 @@
+{
+  "name": "ansible-skills-marketplace",
+  "version": "1.0.0",
+  "description": "Comprehensive Ansible automation skills marketplace following Red Hat Communities of Practice",
+  "plugins": [
+    {
+      "name": "ansible-skills",
+      "path": "..",
+      "description": "Complete Ansible development workflow: playbooks, roles, conversion, troubleshooting, review, and collections",
+      "version": "1.0.0",
+      "skills": [
+        "playbook-creator",
+        "role-developer",
+        "shell-to-ansible",
+        "ansible-troubleshooter",
+        "ansible-cop-review",
+        "ansible-scaffold-collection",
+        "ansible-scaffold-ee",
+        "ansible-navigator-config"
+      ]
+    }
+  ]
+}

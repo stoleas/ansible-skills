@@ -1,0 +1,75 @@
+---
+# ansible-navigator.yml - Development Configuration
+# Optimized for interactive development and troubleshooting
+
+ansible-navigator:
+  # Execution environment settings
+  execution-environment:
+    enabled: true
+    image: quay.io/ansible/creator-ee:latest
+    pull:
+      policy: missing  # Don't pull if image exists locally
+    container-engine: podman
+
+    # Mount project directory
+    volume-mounts:
+      - src: "{project_dir}"
+        dest: /runner/project
+        options: Z  # SELinux label
+
+      # Mount SSH keys for development
+      - src: ~/.ssh
+        dest: /home/runner/.ssh
+        options: ro,Z
+
+    # Pass environment variables
+    environment-variables:
+      set:
+        ANSIBLE_FORCE_COLOR: "true"
+      pass:
+        - SSH_AUTH_SOCK
+
+  # Interactive mode for development
+  mode: interactive
+
+  # Editor integration
+  editor:
+    command: vim {filename}  # Change to your preferred editor (code, nano, etc.)
+    console: true
+
+  # Playbook artifact configuration
+  playbook-artifact:
+    enable: true
+    replay: artifacts/
+    save-as: "artifacts/{playbook_name}-artifact.json"
+
+  # Logging
+  logging:
+    level: info
+    append: true
+    file: ansible-navigator.log
+
+  # Ansible configuration
+  ansible:
+    config: ansible.cfg
+    inventories:
+      - inventory/
+
+  # Color settings
+  color:
+    enable: true
+    osc4: true
+
+  # Display colors
+  display-color:
+    changed: yellow
+    debug: dark_gray
+    ok: green
+    skip: cyan
+    error: red
+
+  # Format
+  format: yaml
+
+  # Time zone
+  time-zone: UTC

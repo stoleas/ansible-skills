@@ -4,9 +4,11 @@ Comprehensive Ansible automation skills following Red Hat Communities of Practic
 
 ## Overview
 
-This plugin provides four specialized skills to help you create, develop, convert, and troubleshoot Ansible automation following industry best practices from Red Hat's Communities of Practice.
+This plugin provides **eight comprehensive skills** to help you create, develop, convert, troubleshoot, review, scaffold, and configure Ansible automation following industry best practices from Red Hat's Communities of Practice.
 
 **Dual Compatible:** This plugin works with both [Claude Code](https://claude.ai/code) (Anthropic's official CLI) and [OpenClaw](https://openclaw.ai/) (open-source AI assistant platform) using the AgentSkills standard format.
+
+**Marketplace Ready:** Includes marketplace.json for easy distribution and discovery in Claude Code plugin marketplaces.
 
 ## Skills Included
 
@@ -37,6 +39,34 @@ Debug, troubleshoot, and validate Ansible playbooks and roles using ansible-lint
 **Use when:** You encounter errors, want to validate playbooks, or need debugging strategies.
 
 **Triggers:** "debug ansible", "troubleshoot playbook", "ansible not working", "fix ansible error", "ansible lint"
+
+### 5. **ansible-cop-review**
+Review Ansible code against all Red Hat Communities of Practice automation good practices.
+
+**Use when:** You want to validate existing code, ensure CoP compliance, or get code quality feedback.
+
+**Triggers:** "review ansible code", "check CoP compliance", "validate against Red Hat standards", "cop review", "ansible best practices review"
+
+### 6. **ansible-scaffold-collection**
+Scaffold new Ansible collections following Red Hat CoP structure and standards.
+
+**Use when:** You need to create a new Ansible content collection with proper organization and packaging.
+
+**Triggers:** "create a collection", "new collection", "scaffold collection", "ansible collection structure", "build a collection"
+
+### 7. **ansible-scaffold-ee**
+Scaffold and build Ansible Execution Environments (containerized Ansible runtime) using ansible-builder.
+
+**Use when:** You need to create a custom execution environment with specific collections, dependencies, or system packages.
+
+**Triggers:** "create execution environment", "scaffold ee", "ansible-builder", "build execution environment", "custom ee image"
+
+### 8. **ansible-navigator-config**
+Configure ansible-navigator for optimal workflow, execution environment integration, and troubleshooting.
+
+**Use when:** You need to set up ansible-navigator configuration, integrate with execution environments, or optimize CI/CD workflows.
+
+**Triggers:** "configure ansible-navigator", "setup navigator", "navigator config", "ansible-navigator settings", "navigator ee integration"
 
 ## Red Hat CoP Best Practices
 
@@ -119,11 +149,15 @@ openclaw plugin install /path/to/ansible-skills
 ```bash
 cd /path/to/ansible-skills
 
-# Install specific skills
+# Install all skills
 openclaw skill install skills/playbook-creator
 openclaw skill install skills/role-developer
 openclaw skill install skills/shell-to-ansible
 openclaw skill install skills/ansible-troubleshooter
+openclaw skill install skills/ansible-cop-review
+openclaw skill install skills/ansible-scaffold-collection
+openclaw skill install skills/ansible-scaffold-ee
+openclaw skill install skills/ansible-navigator-config
 ```
 
 #### Verify Installation
@@ -204,12 +238,70 @@ You: /skill ansible-troubleshooter - Debug this playbook error
 
 The AI will invoke the `ansible-troubleshooter` skill to diagnose issues, suggest fixes, and provide debugging strategies.
 
+### Reviewing Code
+
+**Claude Code:**
+```
+You: Review this Ansible role against Red Hat CoP standards
+```
+
+**OpenClaw:**
+```
+You: /skill ansible-cop-review - Review my playbook for CoP compliance
+```
+
+The AI will invoke the `ansible-cop-review` skill to analyze code against Red Hat CoP standards and provide detailed feedback.
+
+### Scaffolding a Collection
+
+**Claude Code:**
+```
+You: Create a new Ansible collection called company.infrastructure
+```
+
+**OpenClaw:**
+```
+You: /skill ansible-scaffold-collection - Scaffold collection namespace.collection_name
+```
+
+The AI will invoke the `ansible-scaffold-collection` skill to create a complete collection structure with all required files.
+
+### Scaffolding an Execution Environment
+
+**Claude Code:**
+```
+You: Create a custom execution environment with ansible.posix and kubernetes.core collections
+```
+
+**OpenClaw:**
+```
+You: /skill ansible-scaffold-ee - Build EE with specific collections
+```
+
+The AI will invoke the `ansible-scaffold-ee` skill to create an execution environment definition and build process.
+
+### Configuring ansible-navigator
+
+**Claude Code:**
+```
+You: Configure ansible-navigator for development with custom EE
+```
+
+**OpenClaw:**
+```
+You: /skill ansible-navigator-config - Setup navigator for CI/CD
+```
+
+The AI will invoke the `ansible-navigator-config` skill to create appropriate ansible-navigator.yml configuration files.
+
 ## Project Structure
 
 ```
 ansible-skills/
 ├── .claude-plugin/
-│   └── plugin.json              # Plugin metadata
+│   ├── plugin.json              # Claude Code plugin metadata
+│   └── marketplace.json         # Marketplace distribution config
+├── openclaw.plugin.json         # OpenClaw plugin metadata
 ├── skills/
 │   ├── playbook-creator/        # Playbook creation skill
 │   │   ├── SKILL.md
@@ -224,10 +316,23 @@ ansible-skills/
 │   │   ├── SKILL.md
 │   │   ├── examples/
 │   │   └── references/
-│   └── ansible-troubleshooter/  # Debugging skill
+│   ├── ansible-troubleshooter/  # Debugging skill
+│   │   ├── SKILL.md
+│   │   ├── templates/
+│   │   └── references/
+│   ├── ansible-cop-review/      # Code review skill
+│   │   ├── SKILL.md
+│   │   └── templates/
+│   ├── ansible-scaffold-collection/  # Collection scaffolding skill
+│   │   ├── SKILL.md
+│   │   └── templates/
+│   ├── ansible-scaffold-ee/     # Execution environment skill
+│   │   ├── SKILL.md
+│   │   └── templates/
+│   └── ansible-navigator-config/  # Navigator configuration skill
 │       ├── SKILL.md
 │       ├── templates/
-│       └── references/
+│       └── examples/
 ├── README.md
 └── LICENSE
 ```

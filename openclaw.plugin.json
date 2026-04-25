@@ -1,7 +1,7 @@
 {
   "name": "ansible-skills",
   "version": "1.0.0",
-  "description": "Comprehensive Ansible automation skills following Red Hat Communities of Practice best practices. Covers playbook creation, role development, shell script conversion, and troubleshooting.",
+  "description": "Comprehensive Ansible automation skills following Red Hat Communities of Practice best practices. Covers playbook creation, role development, shell script conversion, troubleshooting, code review, and collection scaffolding.",
   "author": {
     "name": "ansible-skills"
   },
@@ -9,19 +9,26 @@
     "skills/playbook-creator",
     "skills/role-developer",
     "skills/shell-to-ansible",
-    "skills/ansible-troubleshooter"
+    "skills/ansible-troubleshooter",
+    "skills/ansible-cop-review",
+    "skills/ansible-scaffold-collection",
+    "skills/ansible-scaffold-ee",
+    "skills/ansible-navigator-config"
   ],
   "keywords": [
     "ansible",
     "automation",
     "playbook",
     "role",
+    "collection",
     "redhat",
     "cop",
     "devops",
     "infrastructure",
     "configuration-management",
     "troubleshooting",
+    "code-review",
+    "scaffolding",
     "molecule",
     "ansible-lint"
   ]

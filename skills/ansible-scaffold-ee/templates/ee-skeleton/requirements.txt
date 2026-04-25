@@ -1,0 +1,28 @@
+# Python Dependencies for Execution Environment
+
+# Core utilities
+jinja2>=3.1.0
+pyyaml>=6.0
+jmespath>=1.0.0
+
+# Cloud providers (uncomment as needed)
+# boto3>=1.26.0           # AWS
+# botocore>=1.29.0        # AWS
+# azure-mgmt>=4.0.0       # Azure
+# google-auth>=2.16.0     # GCP
+
+# Kubernetes/Container platforms
+# kubernetes>=28.0.0
+# openshift>=0.13.0
+
+# Networking
+# netaddr>=0.8.0
+# ipaddress>=1.0.23
+
+# API clients
+# requests>=2.31.0
+# urllib3>=2.0.7
+
+# Data processing
+# xmltodict>=0.13.0
+# jsonschema>=4.17.0
