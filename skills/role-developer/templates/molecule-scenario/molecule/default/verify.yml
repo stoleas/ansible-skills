@@ -1,0 +1,52 @@
+---
+# Molecule verify playbook for [rolename]
+
+- name: Verify
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Verify package is installed
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Assert package is present
+      ansible.builtin.assert:
+        that:
+          - "'[package_name]' in ansible_facts.packages"
+        fail_msg: "Required package not installed"
+        success_msg: "Package verified successfully"
+
+    - name: Verify service is running
+      ansible.builtin.service_facts:
+
+    - name: Assert service is active
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.services['[service_name].service'].state == 'running'
+        fail_msg: "Service is not running"
+        success_msg: "Service verified successfully"
+
+    - name: Verify configuration file exists
+      ansible.builtin.stat:
+        path: /etc/[service]/[service].conf
+      register: config_file
+
+    - name: Assert configuration file is present
+      ansible.builtin.assert:
+        that:
+          - config_file.stat.exists
+          - config_file.stat.isreg
+        fail_msg: "Configuration file not found"
+        success_msg: "Configuration file verified successfully"
+
+    - name: Verify service is listening on correct port
+      ansible.builtin.wait_for:
+        port: 8080
+        timeout: 10
+      ignore_errors: true
+      register: port_check
+
+    - name: Report port check result
+      ansible.builtin.debug:
+        msg: "Service {{ 'is' if port_check is succeeded else 'is not' }} listening on port 8080"

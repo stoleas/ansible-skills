@@ -1,0 +1,44 @@
+---
+# tasks file for [rolename]
+# This file orchestrates role execution via task includes
+
+- name: Include platform-specific variables
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+  tags: ['always']
+
+- name: Gather required facts if not present
+  ansible.builtin.setup:
+    gather_subset:
+      - '!all'
+      - '!min'
+      - distribution
+      - os_family
+  when: ansible_os_family is not defined
+  tags: ['always']
+
+- name: Validate required arguments
+  ansible.builtin.assert:
+    that:
+      - [rolename]_package_name is defined
+      - [rolename]_package_name | length > 0
+      - [rolename]_listen_port >= 1024
+      - [rolename]_listen_port <= 65535
+    fail_msg: "Required variables not properly configured"
+    success_msg: "All required variables validated successfully"
+  tags: ['always']
+
+- name: Include preflight checks
+  ansible.builtin.include_tasks: preflight.yml
+  tags: ['preflight', '[rolename]']
+
+- name: Include installation tasks
+  ansible.builtin.include_tasks: install.yml
+  tags: ['install', '[rolename]']
+
+- name: Include configuration tasks
+  ansible.builtin.include_tasks: configure.yml
+  tags: ['configure', '[rolename]']
+
+- name: Include service management tasks
+  ansible.builtin.include_tasks: service.yml
+  tags: ['service', '[rolename]']

@@ -1,0 +1,67 @@
+---
+# argument_specs for [rolename]
+
+argument_specs:
+  main:
+    short_description: [Short one-line description]
+    description:
+      - [Detailed description line 1]
+      - [Detailed description line 2]
+      - [What this role accomplishes]
+    author:
+      - [Author Name] (@github_handle)
+
+    options:
+      [rolename]_package_name:
+        description: Name or version of the package to install
+        type: str
+        required: false
+        default: "example-package"
+
+      [rolename]_service_enabled:
+        description: Whether to enable the service on boot
+        type: bool
+        required: false
+        default: true
+
+      [rolename]_service_state:
+        description: Desired state of the service
+        type: str
+        required: false
+        default: "started"
+        choices:
+          - started
+          - stopped
+          - restarted
+          - reloaded
+
+      [rolename]_listen_port:
+        description: Port number for the service to listen on
+        type: int
+        required: false
+        default: 8080
+
+      [rolename]_enabled_features:
+        description: List of optional features to enable
+        type: list
+        elements: str
+        required: false
+        default: []
+
+      [rolename]_config_dir:
+        description: Path to configuration directory
+        type: path
+        required: false
+        default: "/etc/[service]"
+
+      [rolename]_user:
+        description: System user to run the service as
+        type: str
+        required: false
+        default: "[service]"
+
+      [rolename]_group:
+        description: System group for the service
+        type: str
+        required: false
+        default: "[service]"

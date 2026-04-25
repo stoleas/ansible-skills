@@ -1,0 +1,16 @@
+---
+# handlers file for [rolename]
+
+- name: Restart [service] service
+  ansible.builtin.service:
+    name: "{{ __[rolename]_service_name }}"
+    state: restarted
+
+- name: Reload [service] service
+  ansible.builtin.service:
+    name: "{{ __[rolename]_service_name }}"
+    state: reloaded
+
+- name: Validate [service] configuration
+  ansible.builtin.command: "[validation_command]"
+  changed_when: false

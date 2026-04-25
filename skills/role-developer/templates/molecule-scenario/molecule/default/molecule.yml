@@ -1,0 +1,77 @@
+---
+# Molecule configuration for [rolename]
+
+dependency:
+  name: galaxy
+
+driver:
+  name: podman
+
+platforms:
+  - name: rhel9-instance
+    image: registry.access.redhat.com/ubi9/ubi-init:latest
+    pre_build_image: true
+    privileged: true
+    command: /sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    capabilities:
+      - SYS_ADMIN
+
+  - name: debian12-instance
+    image: debian:12
+    pre_build_image: true
+    privileged: true
+    command: /sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    capabilities:
+      - SYS_ADMIN
+
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      callbacks_enabled: ansible.posix.profile_tasks
+      stdout_callback: yaml
+  inventory:
+    host_vars:
+      rhel9-instance:
+        [rolename]_package_name: "test-package"
+        [rolename]_listen_port: 8080
+        [rolename]_service_enabled: true
+
+      debian12-instance:
+        [rolename]_package_name: "test-package"
+        [rolename]_listen_port: 8080
+        [rolename]_service_enabled: true
+
+verifier:
+  name: ansible
+
+lint: |
+  set -e
+  ansible-lint
+  yamllint .
+
+scenario:
+  name: default
+  test_sequence:
+    - dependency
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - side_effect
+    - verify
+    - cleanup
+    - destroy

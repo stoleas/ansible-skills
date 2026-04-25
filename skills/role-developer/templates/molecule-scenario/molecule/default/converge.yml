@@ -1,0 +1,11 @@
+---
+# Molecule converge playbook for [rolename]
+
+- name: Converge
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Include role [rolename]
+      ansible.builtin.include_role:
+        name: [rolename]

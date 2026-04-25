@@ -1,0 +1,74 @@
+---
+# Ansible playbook version of install.sh
+# Install and configure PostgreSQL database
+
+- name: Install and configure PostgreSQL
+  hosts: database_servers
+  become: true
+
+  vars:
+    postgresql_listen_addresses: '*'
+    postgresql_port: 5432
+    postgresql_max_connections: 100
+    postgresql_shared_buffers: '256MB'
+
+  tasks:
+    - name: Install PostgreSQL packages
+      ansible.builtin.package:
+        name:
+          - postgresql-server
+          - postgresql-contrib
+        state: present
+
+    - name: Check if database is initialized
+      ansible.builtin.stat:
+        path: /var/lib/pgsql/data/base
+      register: pgsql_data
+
+    - name: Initialize PostgreSQL database
+      ansible.builtin.command: postgresql-setup initdb
+      when: not pgsql_data.stat.exists
+
+    - name: Deploy PostgreSQL configuration
+      ansible.builtin.copy:
+        content: |
+          listen_addresses = '{{ postgresql_listen_addresses }}'
+          port = {{ postgresql_port }}
+          max_connections = {{ postgresql_max_connections }}
+          shared_buffers = {{ postgresql_shared_buffers }}
+        dest: /var/lib/pgsql/data/postgresql.conf
+        owner: postgres
+        group: postgres
+        mode: '0600'
+      notify: Restart PostgreSQL
+
+    - name: Deploy pg_hba.conf
+      ansible.builtin.copy:
+        content: |
+          local   all             postgres                                peer
+          host    all             all             127.0.0.1/32            md5
+          host    all             all             ::1/128                 md5
+        dest: /var/lib/pgsql/data/pg_hba.conf
+        owner: postgres
+        group: postgres
+        mode: '0600'
+      notify: Restart PostgreSQL
+
+    - name: Enable and start PostgreSQL service
+      ansible.builtin.service:
+        name: postgresql
+        state: started
+        enabled: true
+
+    - name: Configure firewall for PostgreSQL
+      ansible.posix.firewalld:
+        service: postgresql
+        permanent: true
+        state: enabled
+        immediate: true
+
+  handlers:
+    - name: Restart PostgreSQL
+      ansible.builtin.service:
+        name: postgresql
+        state: restarted

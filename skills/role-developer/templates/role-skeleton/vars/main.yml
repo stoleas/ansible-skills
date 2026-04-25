@@ -1,0 +1,16 @@
+---
+# vars file for [rolename]
+# Internal variables used by the role (not meant for user override)
+# All internal variables use double underscore prefix
+
+# Required facts for this role
+__[rolename]_required_facts:
+  - ansible_os_family
+  - ansible_distribution
+  - ansible_distribution_major_version
+
+# Temporary directories
+__[rolename]_temp_dir: "/tmp/[rolename]"
+
+# Internal state tracking
+__[rolename]_installation_marker: "/var/lib/[rolename]/.installed"

@@ -1,0 +1,33 @@
+---
+# meta file for [rolename]
+
+galaxy_info:
+  role_name: [rolename]
+  namespace: [namespace]
+  author: [author_name]
+  description: [role_description]
+  company: [company_name]
+  license: MIT
+  min_ansible_version: "2.11"
+
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+
+  galaxy_tags:
+    - [category1]
+    - [category2]
+
+dependencies: []
+  # Example dependency:
+  # - role: namespace.collection.base_linux

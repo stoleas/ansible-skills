@@ -1,0 +1,58 @@
+---
+# defaults file for [rolename]
+# All user-facing variables with comprehensive documentation
+
+# Package configuration
+# Type: string
+# Description: Name or version of the package to manage
+# Default: "example-package"
+# Required: No
+[rolename]_package_name: "example-package"
+
+# Service configuration
+# Type: boolean
+# Description: Whether to enable and start the service
+# Default: true
+# Required: No
+[rolename]_service_enabled: true
+
+# Type: string
+# Description: Desired state of the service (started, stopped, restarted, reloaded)
+# Default: "started"
+# Required: No
+[rolename]_service_state: "started"
+
+# Port configuration
+# Type: integer
+# Description: Port number for the service to listen on
+# Default: 8080
+# Required: No
+# Valid range: 1024-65535
+[rolename]_listen_port: 8080
+
+# Feature configuration
+# Type: list of strings
+# Description: List of optional features to enable
+# Default: []
+# Required: No
+[rolename]_enabled_features: []
+
+# Configuration directory
+# Type: string
+# Description: Path to configuration directory
+# Default: "/etc/[service]"
+# Required: No
+[rolename]_config_dir: "/etc/[service]"
+
+# User configuration
+# Type: string
+# Description: System user to run the service as
+# Default: "[service]"
+# Required: No
+[rolename]_user: "[service]"
+
+# Type: string
+# Description: System group for the service
+# Default: "[service]"
+# Required: No
+[rolename]_group: "[service]"

@@ -1,0 +1,99 @@
+---
+# Ansible playbook version of configure.sh
+# Configure application settings
+
+- name: Configure application
+  hosts: app_servers
+  become: true
+
+  vars:
+    app_home: /opt/myapp
+    app_user: appuser
+    app_group: appuser
+    app_env: production
+    app_port: 8080
+    app_db_host: localhost
+    app_db_port: 5432
+    app_log_level: info
+    app_max_connections: 50
+
+  tasks:
+    - name: Create application user
+      ansible.builtin.user:
+        name: "{{ app_user }}"
+        system: true
+        shell: /sbin/nologin
+        createhome: false
+        state: present
+
+    - name: Create directory structure
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - {path: "{{ app_home }}/config", mode: '0755'}
+        - {path: "{{ app_home }}/data", mode: '0750'}
+        - {path: "{{ app_home }}/logs", mode: '0755'}
+
+    - name: Deploy application configuration
+      ansible.builtin.copy:
+        content: |
+          # Application Configuration
+          APP_ENV={{ app_env }}
+          APP_PORT={{ app_port }}
+          APP_DB_HOST={{ app_db_host }}
+          APP_DB_PORT={{ app_db_port }}
+          APP_LOG_LEVEL={{ app_log_level }}
+          APP_MAX_CONNECTIONS={{ app_max_connections }}
+        dest: "{{ app_home }}/config/app.conf"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0640'
+      notify: Restart myapp
+
+    - name: Configure log rotation
+      ansible.builtin.copy:
+        content: |
+          {{ app_home }}/logs/*.log {
+            daily
+            rotate 7
+            compress
+            delaycompress
+            missingok
+            notifempty
+            create 0640 {{ app_user }} {{ app_group }}
+          }
+        dest: /etc/logrotate.d/myapp
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Deploy systemd service unit
+      ansible.builtin.template:
+        src: myapp.service.j2
+        dest: /etc/systemd/system/myapp.service
+        owner: root
+        group: root
+        mode: '0644'
+      notify:
+        - Reload systemd
+        - Restart myapp
+
+    - name: Enable and start myapp service
+      ansible.builtin.service:
+        name: myapp
+        state: started
+        enabled: true
+
+  handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: Restart myapp
+      ansible.builtin.service:
+        name: myapp
+        state: restarted

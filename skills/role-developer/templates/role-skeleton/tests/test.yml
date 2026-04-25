@@ -1,0 +1,11 @@
+---
+# Legacy test playbook for [rolename]
+# For modern testing, use Molecule
+
+- name: Test [rolename] role
+  hosts: localhost
+  become: true
+
+  roles:
+    - role: [rolename]
+      [rolename]_package_name: "test-package"

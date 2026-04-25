@@ -1,0 +1,20 @@
+---
+# Platform-specific variables for Debian family
+# Loaded automatically based on ansible_os_family
+
+__[rolename]_package_name: "[package-name-debian]"
+__[rolename]_service_name: "[service-name-debian]"
+__[rolename]_config_file: "/etc/[service]/[service].conf"
+__[rolename]_config_dir: "/etc/[service]/conf.d"
+__[rolename]_log_dir: "/var/log/[service]"
+__[rolename]_data_dir: "/var/lib/[service]"
+__[rolename]_pid_file: "/run/[service]/[service].pid"
+
+# Package manager specific
+__[rolename]_package_manager: "apt"
+__[rolename]_package_state: "present"
+
+# Additional packages required on Debian
+__[rolename]_additional_packages:
+  - [dependency1]
+  - [dependency2]

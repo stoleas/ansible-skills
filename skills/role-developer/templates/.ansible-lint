@@ -1,0 +1,42 @@
+---
+# ansible-lint configuration for role
+# Uses moderate profile as recommended by Red Hat CoP
+
+profile: moderate
+
+exclude_paths:
+  - .cache/
+  - .git/
+  - molecule/
+  - tests/
+
+# Skip specific rules if needed (uncomment to use)
+skip_list: []
+  # - yaml[line-length]  # If you have legitimate long lines
+  # - name[casing]       # If you have specific naming requirements
+
+# Rules that should warn but not fail
+warn_list:
+  - experimental  # Experimental rules
+  - meta-no-tags  # Tags in meta/main.yml
+
+# File kind detection
+kinds:
+  - playbook: "**/playbook*.yml"
+  - playbook: "**/site.yml"
+  - tasks: "**/tasks/*.yml"
+  - vars: "**/vars/*.yml"
+  - vars: "**/defaults/*.yml"
+  - handlers: "**/handlers/*.yml"
+  - meta: "**/meta/main.yml"
+  - yaml: "**/*.yaml"
+  - yaml: "**/*.yml"
+
+# Enable offline mode if you don't want to download schemas
+# offline: true
+
+# Mock modules and roles for testing
+# mock_modules:
+#   - custom_module
+# mock_roles:
+#   - custom.role
