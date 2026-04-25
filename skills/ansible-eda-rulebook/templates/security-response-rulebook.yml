@@ -1,0 +1,75 @@
+---
+# Template: Security Event Response
+# Use Case: Automated response to security events and threats
+
+- name: Security Incident Response
+  hosts: all
+
+  sources:
+    - ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5000
+        token: "{{ lookup('env', 'SECURITY_WEBHOOK_TOKEN') }}"
+        hmac_secret: "{{ lookup('env', 'SECURITY_HMAC_SECRET') }}"
+        hmac_algo: sha256
+        hmac_header: X-Hub-Signature-256
+
+  rules:
+    - name: Brute force attack - block IP
+      condition: |
+        event.payload.event_type == "auth_failure" and
+        event.payload.attempt_count >= 5
+      action:
+        run_playbook:
+          name: playbooks/security/block_ip.yml
+          extra_vars:
+            source_ip: "{{ event.payload.source_ip }}"
+            target_host: "{{ event.payload.target_host }}"
+            duration_seconds: 3600
+
+    - name: Malware detected - isolate host
+      condition: |
+        event.payload.event_type == "malware_detected" and
+        event.payload.threat_level == "critical"
+      action:
+        - run_playbook:
+            name: playbooks/security/isolate_host.yml
+            extra_vars:
+              target_host: "{{ event.payload.hostname }}"
+              threat_id: "{{ event.payload.threat_id }}"
+
+        - run_playbook:
+            name: playbooks/security/alert_security_team.yml
+            extra_vars:
+              incident_type: "malware"
+              hostname: "{{ event.payload.hostname }}"
+              details: "{{ event.payload.threat_details }}"
+
+    - name: Unauthorized privilege escalation - alert
+      condition: event.payload.event_type == "privilege_escalation"
+      action:
+        run_playbook:
+          name: playbooks/security/alert_and_log.yml
+          extra_vars:
+            user: "{{ event.payload.user }}"
+            command: "{{ event.payload.command }}"
+            source_host: "{{ event.payload.hostname }}"
+
+    - name: Suspicious file access - audit
+      condition: |
+        event.payload.event_type == "file_access" and
+        event.payload.file_path.startswith("/etc/") or
+        event.payload.file_path.startswith("/var/")
+      action:
+        run_module:
+          name: ansible.builtin.uri
+          module_args:
+            url: "{{ lookup('env', 'SIEM_API_URL') }}/events"
+            method: POST
+            body_format: json
+            body:
+              timestamp: "{{ event.payload.timestamp }}"
+              event_type: "suspicious_file_access"
+              user: "{{ event.payload.user }}"
+              file: "{{ event.payload.file_path }}"
+              host: "{{ event.payload.hostname }}"

@@ -1,0 +1,55 @@
+---
+# Template: Prometheus Alertmanager Integration
+# Use Case: Respond to Prometheus alerts with automated remediation
+
+- name: Prometheus Alert Response
+  hosts: all
+
+  sources:
+    - ansible.eda.alertmanager:
+        host: 0.0.0.0
+        port: 8000
+        data_alerts_path: alerts
+
+  rules:
+    - name: High CPU - investigate and remediate
+      condition: |
+        event.alert.status == "firing" and
+        event.alert.labels.alertname == "HighCPU" and
+        event.alert.labels.severity == "critical"
+      action:
+        run_playbook:
+          name: playbooks/remediate_high_cpu.yml
+          extra_vars:
+            instance: "{{ event.alert.labels.instance }}"
+            job: "{{ event.alert.labels.job }}"
+            value: "{{ event.alert.annotations.value }}"
+
+    - name: Disk space critical - cleanup
+      condition: |
+        event.alert.status == "firing" and
+        event.alert.labels.alertname == "DiskSpaceCritical"
+      action:
+        run_playbook:
+          name: playbooks/cleanup_disk.yml
+          extra_vars:
+            instance: "{{ event.alert.labels.instance }}"
+            mountpoint: "{{ event.alert.labels.mountpoint }}"
+            usage: "{{ event.alert.annotations.usage }}"
+
+    - name: Service down - restart
+      condition: |
+        event.alert.status == "firing" and
+        event.alert.labels.alertname is match(".*Down$")
+      action:
+        run_playbook:
+          name: playbooks/restart_service.yml
+          extra_vars:
+            service_name: "{{ event.alert.labels.service }}"
+            instance: "{{ event.alert.labels.instance }}"
+
+    - name: Alert resolved - notification
+      condition: event.alert.status == "resolved"
+      action:
+        debug:
+          msg: "Alert {{ event.alert.labels.alertname }} resolved for {{ event.alert.labels.instance }}"

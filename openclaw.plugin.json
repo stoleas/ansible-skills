@@ -13,7 +13,8 @@
     "skills/ansible-cop-review",
     "skills/ansible-scaffold-collection",
     "skills/ansible-scaffold-ee",
-    "skills/ansible-navigator-config"
+    "skills/ansible-navigator-config",
+    "skills/ansible-eda-rulebook"
   ],
   "keywords": [
     "ansible",

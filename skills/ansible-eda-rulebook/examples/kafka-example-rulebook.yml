@@ -1,0 +1,75 @@
+---
+# Example: Kafka Event Stream Processing
+# Demonstrates processing events from Apache Kafka topics
+
+- name: Application Event Stream Processing
+  hosts: all
+
+  sources:
+    - ansible.eda.kafka:
+        host: kafka.example.com
+        port: 9092
+        topic: application-events
+        group_id: ansible-eda-consumer
+        offset: latest
+
+  rules:
+    - name: New user signup - provision resources
+      condition: |
+        event.event_type == "user.signup" and
+        event.status == "completed"
+      action:
+        run_playbook:
+          name: playbooks/provision_user_resources.yml
+          extra_vars:
+            user_id: "{{ event.user_id }}"
+            username: "{{ event.username }}"
+            subscription_tier: "{{ event.subscription_tier }}"
+            email: "{{ event.email }}"
+
+    - name: Payment successful - activate premium features
+      condition: |
+        event.event_type == "payment.succeeded" and
+        event.subscription_tier == "premium"
+      action:
+        run_playbook:
+          name: playbooks/activate_premium_features.yml
+          extra_vars:
+            user_id: "{{ event.user_id }}"
+            tier: "{{ event.subscription_tier }}"
+
+    - name: Payment failed - retry billing
+      condition: |
+        event.event_type == "payment.failed" and
+        event.retry_count < 3
+      action:
+        run_playbook:
+          name: playbooks/retry_billing.yml
+          extra_vars:
+            user_id: "{{ event.user_id }}"
+            payment_method_id: "{{ event.payment_method_id }}"
+            retry_count: "{{ event.retry_count }}"
+
+    - name: Payment permanently failed - suspend account
+      condition: |
+        event.event_type == "payment.failed" and
+        event.retry_count >= 3
+      action:
+        run_playbook:
+          name: playbooks/suspend_account.yml
+          extra_vars:
+            user_id: "{{ event.user_id }}"
+            reason: "payment_failure"
+            retry_count: "{{ event.retry_count }}"
+
+    - name: High application error rate - alert
+      condition: |
+        event.event_type == "metrics.error_rate" and
+        event.value > 100
+      action:
+        run_playbook:
+          name: playbooks/alert_oncall.yml
+          extra_vars:
+            service: "{{ event.service_name }}"
+            error_rate: "{{ event.value }}"
+            threshold: 100

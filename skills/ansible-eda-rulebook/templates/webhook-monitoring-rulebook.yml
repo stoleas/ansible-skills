@@ -1,0 +1,52 @@
+---
+# Template: Webhook-based Infrastructure Monitoring
+# Use Case: Receive alerts from monitoring tools and automate response
+
+- name: Infrastructure Monitoring Response
+  hosts: all
+
+  sources:
+    - ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5000
+        token: "{{ lookup('env', 'WEBHOOK_TOKEN') }}"  # Optional: secure with token
+
+  rules:
+    - name: Critical service down - restart
+      condition: |
+        event.payload.severity == "critical" and
+        event.payload.status == "down"
+      action:
+        run_playbook:
+          name: playbooks/restart_service.yml
+          extra_vars:
+            target_host: "{{ event.payload.hostname }}"
+            service_name: "{{ event.payload.service }}"
+
+    - name: High resource usage - scale
+      condition: |
+        event.payload.metric in ["cpu", "memory"] and
+        event.payload.value > 85
+      action:
+        run_playbook:
+          name: playbooks/scale_resources.yml
+          extra_vars:
+            target_host: "{{ event.payload.hostname }}"
+            metric: "{{ event.payload.metric }}"
+            value: "{{ event.payload.value }}"
+
+    - name: Warning level alerts - log only
+      condition: event.payload.severity == "warning"
+      action:
+        debug:
+          msg: "Warning received for {{ event.payload.hostname }}: {{ event.payload.message }}"
+
+    - name: Log all events for audit
+      condition: true
+      action:
+        run_module:
+          name: ansible.builtin.lineinfile
+          module_args:
+            path: /var/log/eda-events.log
+            line: "{{ ansible_date_time.iso8601 }} - {{ event | to_json }}"
+            create: yes

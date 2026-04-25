@@ -1,0 +1,60 @@
+---
+# Example: Multiple Event Sources
+# Demonstrates using multiple event sources in a single rulebook
+
+- name: Multi-Source Event Processing
+  hosts: all
+
+  sources:
+    # Webhook for manual triggers and external systems
+    - ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5000
+        token: "{{ lookup('env', 'WEBHOOK_TOKEN') }}"
+
+    # Alertmanager for Prometheus alerts
+    - ansible.eda.alertmanager:
+        host: 0.0.0.0
+        port: 8000
+
+    # File watcher for log monitoring
+    - ansible.eda.file:
+        path: /var/log/application/error.log
+        encoding: utf-8
+
+  rules:
+    # Webhook-triggered rules
+    - name: Manual maintenance mode trigger
+      condition: |
+        event.payload.action == "enable_maintenance" and
+        event.payload.source == "webhook"
+      action:
+        run_playbook:
+          name: playbooks/enable_maintenance_mode.yml
+          extra_vars:
+            duration_minutes: "{{ event.payload.duration | default(60) }}"
+
+    # Alertmanager-triggered rules
+    - name: Prometheus alert - high memory
+      condition: |
+        event.alert is defined and
+        event.alert.labels.alertname == "HighMemory" and
+        event.alert.status == "firing"
+      action:
+        run_playbook:
+          name: playbooks/investigate_memory.yml
+          extra_vars:
+            instance: "{{ event.alert.labels.instance }}"
+            value: "{{ event.alert.annotations.value }}"
+
+    # File-triggered rules
+    - name: Error log entry detected
+      condition: |
+        event.line is defined and
+        "ERROR" in event.line
+      action:
+        run_playbook:
+          name: playbooks/analyze_error_log.yml
+          extra_vars:
+            log_line: "{{ event.line }}"
+            log_file: "{{ event.file }}"

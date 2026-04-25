@@ -4,7 +4,7 @@ Comprehensive Ansible automation skills following Red Hat Communities of Practic
 
 ## Overview
 
-This plugin provides **eight comprehensive skills** to help you create, develop, convert, troubleshoot, review, scaffold, and configure Ansible automation following industry best practices from Red Hat's Communities of Practice.
+This plugin provides **nine comprehensive skills** to help you create, develop, convert, troubleshoot, review, scaffold, configure, and automate event-driven responses with Ansible following industry best practices from Red Hat's Communities of Practice.
 
 **Dual Compatible:** This plugin works with both [Claude Code](https://claude.ai/code) (Anthropic's official CLI) and [OpenClaw](https://openclaw.ai/) (open-source AI assistant platform) using the AgentSkills standard format.
 
@@ -67,6 +67,13 @@ Configure ansible-navigator for optimal workflow, execution environment integrat
 **Use when:** You need to set up ansible-navigator configuration, integrate with execution environments, or optimize CI/CD workflows.
 
 **Triggers:** "configure ansible-navigator", "setup navigator", "navigator config", "ansible-navigator settings", "navigator ee integration"
+
+### 9. **ansible-eda-rulebook**
+Create Event-Driven Ansible rulebooks that respond to events from various sources for automated infrastructure response.
+
+**Use when:** You need to automate responses to monitoring alerts, security events, CI/CD triggers, or any event-driven automation scenario.
+
+**Triggers:** "create eda rulebook", "event-driven ansible", "ansible rulebook", "webhook automation", "event automation", "integrate event source"
 
 ## Red Hat CoP Best Practices
 
@@ -158,6 +165,7 @@ openclaw skill install skills/ansible-cop-review
 openclaw skill install skills/ansible-scaffold-collection
 openclaw skill install skills/ansible-scaffold-ee
 openclaw skill install skills/ansible-navigator-config
+openclaw skill install skills/ansible-eda-rulebook
 ```
 
 #### Verify Installation
@@ -294,6 +302,20 @@ You: /skill ansible-navigator-config - Setup navigator for CI/CD
 
 The AI will invoke the `ansible-navigator-config` skill to create appropriate ansible-navigator.yml configuration files.
 
+### Creating EDA Rulebooks
+
+**Claude Code:**
+```
+You: Create an EDA rulebook for webhook-based monitoring with automated remediation
+```
+
+**OpenClaw:**
+```
+You: /skill ansible-eda-rulebook - Create rulebook for Prometheus Alertmanager integration
+```
+
+The AI will invoke the `ansible-eda-rulebook` skill to create event-driven automation rulebooks with appropriate event sources, conditions, and actions.
+
 ## Project Structure
 
 ```
@@ -329,10 +351,15 @@ ansible-skills/
 │   ├── ansible-scaffold-ee/     # Execution environment skill
 │   │   ├── SKILL.md
 │   │   └── templates/
-│   └── ansible-navigator-config/  # Navigator configuration skill
+│   ├── ansible-navigator-config/  # Navigator configuration skill
+│   │   ├── SKILL.md
+│   │   ├── templates/
+│   │   └── examples/
+│   └── ansible-eda-rulebook/    # Event-driven automation skill
 │       ├── SKILL.md
 │       ├── templates/
-│       └── examples/
+│       ├── examples/
+│       └── references/
 ├── README.md
 └── LICENSE
 ```

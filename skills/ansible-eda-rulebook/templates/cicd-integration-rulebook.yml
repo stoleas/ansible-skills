@@ -1,0 +1,63 @@
+---
+# Template: CI/CD Pipeline Integration
+# Use Case: Automate deployments and testing based on GitHub/GitLab events
+
+- name: CI/CD Deployment Automation
+  hosts: localhost
+
+  sources:
+    - ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5000
+        hmac_secret: "{{ lookup('env', 'GITHUB_WEBHOOK_SECRET') }}"
+        hmac_header: X-Hub-Signature-256
+        hmac_algo: sha256
+        hmac_format: hex
+
+  rules:
+    - name: Deploy to production on main branch
+      condition: |
+        event.payload.ref == "refs/heads/main" and
+        event.payload.repository.name == "my-application" and
+        event.payload.head_commit is defined
+      action:
+        run_playbook:
+          name: playbooks/deploy_production.yml
+          extra_vars:
+            git_repo: "{{ event.payload.repository.clone_url }}"
+            git_commit: "{{ event.payload.after }}"
+            deployer: "{{ event.payload.pusher.name }}"
+            commit_message: "{{ event.payload.head_commit.message }}"
+
+    - name: Deploy to staging on develop branch
+      condition: |
+        event.payload.ref == "refs/heads/develop" and
+        event.payload.repository.name == "my-application"
+      action:
+        run_playbook:
+          name: playbooks/deploy_staging.yml
+          extra_vars:
+            git_commit: "{{ event.payload.after }}"
+
+    - name: Run tests on pull request
+      condition: |
+        event.payload.pull_request is defined and
+        (event.payload.action == "opened" or event.payload.action == "synchronize")
+      action:
+        run_playbook:
+          name: playbooks/run_ci_tests.yml
+          extra_vars:
+            pr_number: "{{ event.payload.number }}"
+            pr_branch: "{{ event.payload.pull_request.head.ref }}"
+            pr_repo: "{{ event.payload.pull_request.head.repo.clone_url }}"
+
+    - name: Rollback on deployment failure
+      condition: |
+        event.payload.state == "failure" and
+        event.payload.context == "production/deploy"
+      action:
+        run_playbook:
+          name: playbooks/rollback_deployment.yml
+          extra_vars:
+            failed_commit: "{{ event.payload.commit.sha }}"
+            environment: production

@@ -13,7 +13,8 @@
     "ansible-cop-review",
     "ansible-scaffold-collection",
     "ansible-scaffold-ee",
-    "ansible-navigator-config"
+    "ansible-navigator-config",
+    "ansible-eda-rulebook"
   ],
   "keywords": [
     "ansible",
