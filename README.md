@@ -1,10 +1,12 @@
-# Ansible Skills for Claude Code
+# Ansible Skills for Claude Code & OpenClaw
 
 Comprehensive Ansible automation skills following Red Hat Communities of Practice (CoP) best practices.
 
 ## Overview
 
 This plugin provides four specialized skills to help you create, develop, convert, and troubleshoot Ansible automation following industry best practices from Red Hat's Communities of Practice.
+
+**Dual Compatible:** This plugin works with both [Claude Code](https://claude.ai/code) (Anthropic's official CLI) and [OpenClaw](https://openclaw.ai/) (open-source AI assistant platform) using the AgentSkills standard format.
 
 ## Skills Included
 
@@ -73,14 +75,16 @@ All skills in this plugin enforce the following Red Hat Communities of Practice 
 
 ## Installation
 
-### Option 1: Clone into Claude Code plugins directory
+### For Claude Code
+
+#### Option 1: Clone into Claude Code plugins directory
 
 ```bash
 cd ~/.claude/plugins/
 git clone <repository-url> ansible-skills
 ```
 
-### Option 2: Use as local plugin
+#### Option 2: Use as local plugin
 
 ```bash
 # Clone to any directory
@@ -90,31 +94,81 @@ git clone <repository-url> /path/to/ansible-skills
 ln -s /path/to/ansible-skills ~/.claude/plugins/ansible-skills
 ```
 
-### Enable the Plugin
+#### Verify Installation
 
-The plugin should be automatically detected by Claude Code. Verify with:
+The plugin should be automatically detected by Claude Code:
 
 ```bash
 claude plugins list
 ```
 
+### For OpenClaw
+
+#### Option 1: Install Local Plugin
+
+```bash
+# Clone the repository
+git clone <repository-url> /path/to/ansible-skills
+
+# Install as OpenClaw plugin
+openclaw plugin install /path/to/ansible-skills
+```
+
+#### Option 2: Install Individual Skills from Local Directory
+
+```bash
+cd /path/to/ansible-skills
+
+# Install specific skills
+openclaw skill install skills/playbook-creator
+openclaw skill install skills/role-developer
+openclaw skill install skills/shell-to-ansible
+openclaw skill install skills/ansible-troubleshooter
+```
+
+#### Verify Installation
+
+```bash
+openclaw skill list
+```
+
+### Compatibility
+
+Both platforms use the **AgentSkills standard format** developed by Anthropic, ensuring seamless compatibility:
+- ✅ Same SKILL.md frontmatter structure
+- ✅ Compatible markdown instruction format
+- ✅ Cross-platform skill loading
+- ✅ Shared skill ecosystem
+
 ## Quick Start
 
 ### Creating a Playbook
 
+**Claude Code:**
 ```
 You: Create a playbook for web server type following Red Hat CoP
 ```
 
-Claude will invoke the `playbook-creator` skill and generate a playbook following the Type-Function pattern with proper structure and tagging.
+**OpenClaw:**
+```
+You: /skill playbook-creator - Create a playbook for web server type
+```
+
+The AI will invoke the `playbook-creator` skill and generate a playbook following the Type-Function pattern with proper structure and tagging.
 
 ### Developing a Role
 
+**Claude Code:**
 ```
 You: Create a new role for apache_install
 ```
 
-Claude will invoke the `role-developer` skill and generate:
+**OpenClaw:**
+```
+You: /skill role-developer - Create a new role for apache_install
+```
+
+The AI will invoke the `role-developer` skill and generate:
 - Complete role directory structure
 - Argument validation in `meta/argument_specs.yml`
 - Platform-specific variable files
@@ -124,19 +178,31 @@ Claude will invoke the `role-developer` skill and generate:
 
 ### Converting Shell Scripts
 
+**Claude Code:**
 ```
 You: Convert this bash script to an Ansible playbook
 ```
 
-Claude will invoke the `shell-to-ansible` skill and transform procedural shell commands into declarative, idempotent Ansible tasks using appropriate modules.
+**OpenClaw:**
+```
+You: /skill shell-to-ansible - Convert this bash script to Ansible
+```
+
+The AI will invoke the `shell-to-ansible` skill and transform procedural shell commands into declarative, idempotent Ansible tasks using appropriate modules.
 
 ### Troubleshooting
 
+**Claude Code:**
 ```
 You: Debug this ansible playbook error
 ```
 
-Claude will invoke the `ansible-troubleshooter` skill to diagnose issues, suggest fixes, and provide debugging strategies.
+**OpenClaw:**
+```
+You: /skill ansible-troubleshooter - Debug this playbook error
+```
+
+The AI will invoke the `ansible-troubleshooter` skill to diagnose issues, suggest fixes, and provide debugging strategies.
 
 ## Project Structure
 
@@ -251,6 +317,47 @@ pip install yamllint
 - [ansible-lint Rules](https://ansible-lint.readthedocs.io/)
 - [Molecule Documentation](https://molecule.readthedocs.io/)
 
+## Platform-Specific Notes
+
+### Claude Code
+- Skills auto-activate based on trigger phrases in conversations
+- Access via natural language prompts
+- Integrated with Claude's context window
+
+### OpenClaw
+- Skills can be invoked via `/skill <skill-name>` command
+- Works with multiple AI providers (Claude, GPT-4, DeepSeek, Gemini)
+- Can integrate with messaging platforms (Signal, Telegram, Discord, WhatsApp)
+
+## File Structure
+
+```
+ansible-skills/
+├── .claude-plugin/
+│   └── plugin.json              # Claude Code plugin metadata
+├── openclaw.plugin.json         # OpenClaw plugin metadata
+├── skills/
+│   ├── playbook-creator/
+│   │   ├── SKILL.md            # Skill definition (AgentSkills format)
+│   │   ├── templates/          # Playbook templates
+│   │   └── examples/           # Example playbooks
+│   ├── role-developer/
+│   │   ├── SKILL.md
+│   │   ├── templates/          # Role skeleton & Molecule scenarios
+│   │   ├── examples/           # Example roles
+│   │   └── references/         # Reference documentation
+│   ├── shell-to-ansible/
+│   │   ├── SKILL.md
+│   │   ├── examples/           # Before/after conversions
+│   │   └── references/         # Module mappings & patterns
+│   └── ansible-troubleshooter/
+│       ├── SKILL.md
+│       ├── templates/          # Troubleshooting checklists
+│       └── references/         # Debugging guides
+├── README.md
+└── LICENSE
+```
+
 ## Contributing
 
 Contributions are welcome! Please:
@@ -258,7 +365,31 @@ Contributions are welcome! Please:
 1. Follow Red Hat CoP standards in all examples
 2. Test templates with ansible-lint (moderate profile)
 3. Validate YAML syntax
-4. Update documentation
+4. Ensure compatibility with both Claude Code and OpenClaw
+5. Test skills on multiple platforms
+6. Update documentation
+
+### Testing Your Changes
+
+**Claude Code:**
+```bash
+claude plugins reload
+claude plugins list
+```
+
+**OpenClaw:**
+```bash
+openclaw skill inspect <skill-name>
+openclaw skill install /path/to/skill
+```
+
+## Support & Resources
+
+- [Claude Code Documentation](https://docs.anthropic.com/claude/docs/claude-code)
+- [OpenClaw Documentation](https://docs.openclaw.ai/)
+- [ClawHub Skill Registry](https://clawhub.ai/)
+- [Red Hat CoP - Ansible Good Practices](https://redhat-cop.github.io/automation-good-practices/)
+- [AgentSkills Standard Format](https://openclaw-ai.com/en/docs/tools/skills)
 
 ## License
 
