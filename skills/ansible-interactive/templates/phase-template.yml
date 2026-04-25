@@ -1,0 +1,52 @@
+---
+# Interactive Development Phase Template
+# Copy and adapt this template for each development phase
+
+phase_name: "Phase X: [Phase Name]"
+objective: "[What this phase accomplishes]"
+
+prerequisites:
+  - "[What must be complete before starting this phase]"
+  - "[Required tools or access]"
+
+steps:
+  - step: 1
+    name: "[Step name]"
+    description: "[What this step does]"
+    commands:
+      - "[Command to run]"
+      - "[Another command]"
+    validation:
+      - "[How to verify this step succeeded]"
+    expected_output: |
+      [Example of successful output]
+
+  - step: 2
+    name: "[Next step name]"
+    description: "[What this step does]"
+    commands:
+      - "[Command to run]"
+    validation:
+      - "[How to verify this step succeeded]"
+
+interactive_questions:
+  - "[Question to ask user before proceeding]"
+  - "[Question to gather requirements]"
+
+validation_criteria:
+  - "[Overall phase validation criterion]"
+  - "[Another validation criterion]"
+
+troubleshooting:
+  - issue: "[Common issue that might occur]"
+    symptoms:
+      - "[How to recognize this issue]"
+    diagnosis:
+      - "[Command to diagnose]"
+    solution:
+      - "[Steps to resolve]"
+
+next_phase: "Phase X+1: [Next Phase Name]"
+
+notes: |
+  [Additional context or tips for this phase]

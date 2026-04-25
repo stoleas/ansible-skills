@@ -17,7 +17,8 @@
         "ansible-scaffold-collection",
         "ansible-scaffold-ee",
         "ansible-navigator-config",
-        "ansible-eda-rulebook"
+        "ansible-eda-rulebook",
+        "ansible-interactive"
       ]
     }
   ]

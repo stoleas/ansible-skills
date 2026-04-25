@@ -14,7 +14,8 @@
     "skills/ansible-scaffold-collection",
     "skills/ansible-scaffold-ee",
     "skills/ansible-navigator-config",
-    "skills/ansible-eda-rulebook"
+    "skills/ansible-eda-rulebook",
+    "skills/ansible-interactive"
   ],
   "keywords": [
     "ansible",

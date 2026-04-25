@@ -4,7 +4,7 @@ Comprehensive Ansible automation skills following Red Hat Communities of Practic
 
 ## Overview
 
-This plugin provides **nine comprehensive skills** to help you create, develop, convert, troubleshoot, review, scaffold, configure, and automate event-driven responses with Ansible following industry best practices from Red Hat's Communities of Practice.
+This plugin provides **ten comprehensive skills** to help you create, develop, convert, troubleshoot, review, scaffold, configure, automate event-driven responses, and guide interactive development with Ansible following industry best practices from Red Hat's Communities of Practice.
 
 **Dual Compatible:** This plugin works with both [Claude Code](https://claude.ai/code) (Anthropic's official CLI) and [OpenClaw](https://openclaw.ai/) (open-source AI assistant platform) using the AgentSkills standard format.
 
@@ -74,6 +74,13 @@ Create Event-Driven Ansible rulebooks that respond to events from various source
 **Use when:** You need to automate responses to monitoring alerts, security events, CI/CD triggers, or any event-driven automation scenario.
 
 **Triggers:** "create eda rulebook", "event-driven ansible", "ansible rulebook", "webhook automation", "event automation", "integrate event source"
+
+### 10. **ansible-interactive**
+Interactive step-by-step guided Ansible development workflow from environment setup through playbook deployment.
+
+**Use when:** You need hands-on guidance through Ansible development, want to learn best practices interactively, or prefer incremental validated development.
+
+**Triggers:** "guide me through ansible", "interactive ansible setup", "step by step ansible", "walk me through ansible", "help me start with ansible"
 
 ## Red Hat CoP Best Practices
 
@@ -166,6 +173,7 @@ openclaw skill install skills/ansible-scaffold-collection
 openclaw skill install skills/ansible-scaffold-ee
 openclaw skill install skills/ansible-navigator-config
 openclaw skill install skills/ansible-eda-rulebook
+openclaw skill install skills/ansible-interactive
 ```
 
 #### Verify Installation
@@ -316,6 +324,20 @@ You: /skill ansible-eda-rulebook - Create rulebook for Prometheus Alertmanager i
 
 The AI will invoke the `ansible-eda-rulebook` skill to create event-driven automation rulebooks with appropriate event sources, conditions, and actions.
 
+### Interactive Guided Development
+
+**Claude Code:**
+```
+You: Guide me through setting up my first Ansible project step by step
+```
+
+**OpenClaw:**
+```
+You: /skill ansible-interactive - Walk me through Ansible development
+```
+
+The AI will invoke the `ansible-interactive` skill to provide hands-on, incremental guidance through environment setup, connectivity testing, playbook development, and deployment.
+
 ## Project Structure
 
 ```
@@ -355,7 +377,12 @@ ansible-skills/
 │   │   ├── SKILL.md
 │   │   ├── templates/
 │   │   └── examples/
-│   └── ansible-eda-rulebook/    # Event-driven automation skill
+│   ├── ansible-eda-rulebook/    # Event-driven automation skill
+│   │   ├── SKILL.md
+│   │   ├── templates/
+│   │   ├── examples/
+│   │   └── references/
+│   └── ansible-interactive/     # Interactive guided development skill
 │       ├── SKILL.md
 │       ├── templates/
 │       ├── examples/
