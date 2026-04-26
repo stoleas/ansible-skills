@@ -171,23 +171,23 @@ openclaw plugin install /path/to/ansible-skills
 cd /path/to/ansible-skills
 
 # Install all skills
-openclaw skill install skills/playbook-creator
-openclaw skill install skills/role-developer
-openclaw skill install skills/shell-to-ansible
-openclaw skill install skills/ansible-troubleshooter
-openclaw skill install skills/ansible-cop-review
-openclaw skill install skills/ansible-scaffold-collection
-openclaw skill install skills/ansible-scaffold-ee
-openclaw skill install skills/ansible-navigator-config
-openclaw skill install skills/ansible-eda-rulebook
-openclaw skill install skills/ansible-interactive
-openclaw skill install skills/aap-config-as-code
+openclaw skills install skills/playbook-creator
+openclaw skills install skills/role-developer
+openclaw skills install skills/shell-to-ansible
+openclaw skills install skills/ansible-troubleshooter
+openclaw skills install skills/ansible-cop-review
+openclaw skills install skills/ansible-scaffold-collection
+openclaw skills install skills/ansible-scaffold-ee
+openclaw skills install skills/ansible-navigator-config
+openclaw skills install skills/ansible-eda-rulebook
+openclaw skills install skills/ansible-interactive
+openclaw skills install skills/aap-config-as-code
 ```
 
 #### Verify Installation
 
 ```bash
-openclaw skill list
+openclaw skills list
 ```
 
 ### Compatibility
@@ -565,8 +565,8 @@ claude plugins list
 
 **OpenClaw:**
 ```bash
-openclaw skill inspect <skill-name>
-openclaw skill install /path/to/skill
+openclaw skills inspect <skill-name>
+openclaw skills install /path/to/skill
 ```
 
 ## Support & Resources
