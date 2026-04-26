@@ -4,7 +4,7 @@ Comprehensive Ansible automation skills following Red Hat Communities of Practic
 
 ## Overview
 
-This plugin provides **ten comprehensive skills** to help you create, develop, convert, troubleshoot, review, scaffold, configure, automate event-driven responses, and guide interactive development with Ansible following industry best practices from Red Hat's Communities of Practice.
+This plugin provides **eleven comprehensive skills** to help you create, develop, convert, troubleshoot, review, scaffold, configure, automate event-driven responses, guide interactive development, and manage Ansible Automation Platform with Ansible following industry best practices from Red Hat's Communities of Practice.
 
 **Dual Compatible:** This plugin works with both [Claude Code](https://claude.ai/code) (Anthropic's official CLI) and [OpenClaw](https://openclaw.ai/) (open-source AI assistant platform) using the AgentSkills standard format.
 
@@ -81,6 +81,13 @@ Interactive step-by-step guided Ansible development workflow from environment se
 **Use when:** You need hands-on guidance through Ansible development, want to learn best practices interactively, or prefer incremental validated development.
 
 **Triggers:** "guide me through ansible", "interactive ansible setup", "step by step ansible", "walk me through ansible", "help me start with ansible"
+
+### 11. **aap-config-as-code**
+Configure Ansible Automation Platform as code using Red Hat CoP infra.aap_configuration collection for infrastructure-as-code management.
+
+**Use when:** You need to manage AAP configuration as version-controlled code, deploy multi-environment AAP setups, or automate AAP platform configuration.
+
+**Triggers:** "configure AAP as code", "aap configuration management", "manage AAP with ansible", "aap infrastructure as code", "configure automation controller"
 
 ## Red Hat CoP Best Practices
 
@@ -174,6 +181,7 @@ openclaw skill install skills/ansible-scaffold-ee
 openclaw skill install skills/ansible-navigator-config
 openclaw skill install skills/ansible-eda-rulebook
 openclaw skill install skills/ansible-interactive
+openclaw skill install skills/aap-config-as-code
 ```
 
 #### Verify Installation
@@ -338,6 +346,20 @@ You: /skill ansible-interactive - Walk me through Ansible development
 
 The AI will invoke the `ansible-interactive` skill to provide hands-on, incremental guidance through environment setup, connectivity testing, playbook development, and deployment.
 
+### Configuring AAP as Code
+
+**Claude Code:**
+```
+You: Configure Ansible Automation Platform as code with multi-environment support
+```
+
+**OpenClaw:**
+```
+You: /skill aap-config-as-code - Set up AAP configuration for dev/qa/prod environments
+```
+
+The AI will invoke the `aap-config-as-code` skill to create infrastructure-as-code configuration for AAP using the Red Hat CoP infra.aap_configuration collection.
+
 ## Project Structure
 
 ```
@@ -382,7 +404,12 @@ ansible-skills/
 │   │   ├── templates/
 │   │   ├── examples/
 │   │   └── references/
-│   └── ansible-interactive/     # Interactive guided development skill
+│   ├── ansible-interactive/     # Interactive guided development skill
+│   │   ├── SKILL.md
+│   │   ├── templates/
+│   │   ├── examples/
+│   │   └── references/
+│   └── aap-config-as-code/      # AAP configuration as code skill
 │       ├── SKILL.md
 │       ├── templates/
 │       ├── examples/

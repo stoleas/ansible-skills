@@ -1,0 +1,320 @@
+---
+# Complete Workflow Example: CI/CD Pipeline
+# This example shows a comprehensive workflow for a CI/CD deployment pipeline
+
+controller_workflows:
+  - name: Full Stack CI/CD Pipeline
+    organization: Engineering
+    description: Complete CI/CD pipeline from build to deployment
+    inventory: Production Servers
+    extra_vars:
+      notify_channel: "#deployments"
+    survey_enabled: true
+    survey_spec:
+      name: Deployment Configuration
+      description: Configure deployment parameters
+      spec:
+        - question_name: Application Version
+          question_description: Version tag to deploy
+          required: true
+          type: text
+          variable: app_version
+          default: latest
+
+        - question_name: Environment
+          question_description: Target environment
+          required: true
+          type: multiplechoice
+          variable: target_environment
+          choices:
+            - staging
+            - production
+          default: staging
+
+        - question_name: Run Smoke Tests
+          question_description: Run smoke tests after deployment?
+          required: false
+          type: multiplechoice
+          variable: run_smoke_tests
+          choices:
+            - "yes"
+            - "no"
+          default: "yes"
+
+        - question_name: Notification Email
+          question_description: Email for deployment notifications
+          required: false
+          type: text
+          variable: notification_email
+
+    # Workflow nodes define the execution flow
+    workflow_nodes:
+      # Step 1: Pre-deployment checks
+      - identifier: pre_deployment_checks
+        unified_job_template: Pre-Deployment Validation
+        success_nodes:
+          - backup_database
+          - backup_application
+
+      # Step 2: Parallel backups
+      - identifier: backup_database
+        unified_job_template: Backup Database
+        success_nodes:
+          - build_application
+        failure_nodes:
+          - notify_backup_failed
+
+      - identifier: backup_application
+        unified_job_template: Backup Application Files
+        success_nodes:
+          - build_application
+        failure_nodes:
+          - notify_backup_failed
+
+      # Step 3: Build application
+      - identifier: build_application
+        unified_job_template: Build Application
+        extra_data:
+          version: "{{ app_version }}"
+        success_nodes:
+          - run_unit_tests
+        failure_nodes:
+          - notify_build_failed
+
+      # Step 4: Run tests
+      - identifier: run_unit_tests
+        unified_job_template: Run Unit Tests
+        success_nodes:
+          - run_integration_tests
+        failure_nodes:
+          - notify_test_failed
+
+      - identifier: run_integration_tests
+        unified_job_template: Run Integration Tests
+        success_nodes:
+          - deploy_database_migrations
+        failure_nodes:
+          - notify_test_failed
+
+      # Step 5: Database migrations
+      - identifier: deploy_database_migrations
+        unified_job_template: Deploy Database Migrations
+        extra_data:
+          environment: "{{ target_environment }}"
+        success_nodes:
+          - deploy_application
+        failure_nodes:
+          - rollback_database
+
+      # Step 6: Deploy application
+      - identifier: deploy_application
+        unified_job_template: Deploy Application
+        credentials:
+          - Production SSH Key
+          - Production AWS
+        extra_data:
+          version: "{{ app_version }}"
+          environment: "{{ target_environment }}"
+        success_nodes:
+          - health_check
+        failure_nodes:
+          - rollback_deployment
+
+      # Step 7: Health check
+      - identifier: health_check
+        unified_job_template: Application Health Check
+        success_nodes:
+          - conditional_smoke_tests
+        failure_nodes:
+          - rollback_deployment
+
+      # Step 8: Conditional smoke tests
+      - identifier: conditional_smoke_tests
+        unified_job_template: Run Smoke Tests
+        all_parents_must_converge: true
+        success_nodes:
+          - clear_cache
+        failure_nodes:
+          - rollback_deployment
+
+      # Step 9: Clear cache
+      - identifier: clear_cache
+        unified_job_template: Clear Application Cache
+        success_nodes:
+          - update_monitoring
+
+      # Step 10: Update monitoring
+      - identifier: update_monitoring
+        unified_job_template: Update Monitoring Dashboard
+        success_nodes:
+          - notify_success
+
+      # Rollback paths
+      - identifier: rollback_deployment
+        unified_job_template: Rollback Application
+        always_nodes:
+          - rollback_database
+
+      - identifier: rollback_database
+        unified_job_template: Rollback Database
+        always_nodes:
+          - restore_backups
+
+      - identifier: restore_backups
+        unified_job_template: Restore from Backup
+        always_nodes:
+          - notify_rollback_complete
+
+      # Notification nodes
+      - identifier: notify_success
+        unified_job_template: Send Notification
+        extra_data:
+          status: success
+          message: "Deployment of {{ app_version }} to {{ target_environment }} completed successfully"
+          email: "{{ notification_email }}"
+
+      - identifier: notify_backup_failed
+        unified_job_template: Send Notification
+        extra_data:
+          status: failure
+          message: "Backup failed - deployment aborted"
+
+      - identifier: notify_build_failed
+        unified_job_template: Send Notification
+        extra_data:
+          status: failure
+          message: "Build failed for version {{ app_version }}"
+
+      - identifier: notify_test_failed
+        unified_job_template: Send Notification
+        extra_data:
+          status: failure
+          message: "Tests failed - deployment aborted"
+
+      - identifier: notify_rollback_complete
+        unified_job_template: Send Notification
+        extra_data:
+          status: warning
+          message: "Deployment failed - rollback completed"
+
+---
+# Supporting Job Templates for the workflow
+
+controller_templates:
+  - name: Pre-Deployment Validation
+    organization: Engineering
+    inventory: Production Servers
+    project: CI/CD Automation
+    playbook: playbooks/validate_environment.yml
+    execution_environment: Python EE
+
+  - name: Backup Database
+    organization: Engineering
+    inventory: Database Servers
+    project: CI/CD Automation
+    playbook: playbooks/backup_database.yml
+    credentials:
+      - Database Credential
+    execution_environment: Database EE
+
+  - name: Backup Application Files
+    organization: Engineering
+    inventory: Application Servers
+    project: CI/CD Automation
+    playbook: playbooks/backup_application.yml
+    credentials:
+      - Production SSH Key
+
+  - name: Build Application
+    organization: Engineering
+    inventory: localhost
+    project: CI/CD Automation
+    playbook: playbooks/build_application.yml
+    ask_variables_on_launch: true
+    execution_environment: Build EE
+
+  - name: Run Unit Tests
+    organization: Engineering
+    inventory: localhost
+    project: CI/CD Automation
+    playbook: playbooks/run_unit_tests.yml
+    execution_environment: Test EE
+
+  - name: Run Integration Tests
+    organization: Engineering
+    inventory: Test Environment
+    project: CI/CD Automation
+    playbook: playbooks/run_integration_tests.yml
+    execution_environment: Test EE
+
+  - name: Deploy Database Migrations
+    organization: Engineering
+    inventory: Database Servers
+    project: CI/CD Automation
+    playbook: playbooks/deploy_migrations.yml
+    credentials:
+      - Database Credential
+    ask_variables_on_launch: true
+
+  - name: Deploy Application
+    organization: Engineering
+    inventory: Production Servers
+    project: CI/CD Automation
+    playbook: playbooks/deploy_application.yml
+    ask_variables_on_launch: true
+    ask_credential_on_launch: true
+
+  - name: Application Health Check
+    organization: Engineering
+    inventory: Production Servers
+    project: CI/CD Automation
+    playbook: playbooks/health_check.yml
+
+  - name: Run Smoke Tests
+    organization: Engineering
+    inventory: Production Servers
+    project: CI/CD Automation
+    playbook: playbooks/smoke_tests.yml
+
+  - name: Clear Application Cache
+    organization: Engineering
+    inventory: Production Servers
+    project: CI/CD Automation
+    playbook: playbooks/clear_cache.yml
+
+  - name: Update Monitoring Dashboard
+    organization: Engineering
+    inventory: localhost
+    project: CI/CD Automation
+    playbook: playbooks/update_monitoring.yml
+
+  - name: Rollback Application
+    organization: Engineering
+    inventory: Production Servers
+    project: CI/CD Automation
+    playbook: playbooks/rollback_application.yml
+    ask_variables_on_launch: true
+
+  - name: Rollback Database
+    organization: Engineering
+    inventory: Database Servers
+    project: CI/CD Automation
+    playbook: playbooks/rollback_database.yml
+    credentials:
+      - Database Credential
+
+  - name: Restore from Backup
+    organization: Engineering
+    inventory: Production Servers
+    project: CI/CD Automation
+    playbook: playbooks/restore_backup.yml
+    credentials:
+      - Production SSH Key
+      - Database Credential
+
+  - name: Send Notification
+    organization: Engineering
+    inventory: localhost
+    project: CI/CD Automation
+    playbook: playbooks/send_notification.yml
+    ask_variables_on_launch: true

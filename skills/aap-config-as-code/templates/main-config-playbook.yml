@@ -1,0 +1,198 @@
+---
+# Main AAP Configuration Playbook Template
+# This playbook configures AAP using infra.aap_configuration collection
+
+- name: Configure Ansible Automation Platform
+  hosts: automation_controller
+  connection: local
+  gather_facts: false
+
+  vars:
+    # Target environment (dev, qa, prod)
+    target_environment: "{{ lookup('env', 'AAP_ENV') | default('dev', true) }}"
+
+    # Configuration base paths
+    config_all_path: "config/all"
+    config_env_path: "config/{{ target_environment }}"
+
+    # Async configuration
+    aap_configuration_async_delay: 1
+    aap_configuration_async_retries: 60
+
+  pre_tasks:
+    - name: Validate target environment
+      ansible.builtin.assert:
+        that:
+          - target_environment in ['dev', 'qa', 'prod']
+        fail_msg: "Invalid environment: {{ target_environment }}"
+
+    - name: Display configuration target
+      ansible.builtin.debug:
+        msg: "Configuring AAP for environment: {{ target_environment }}"
+
+    - name: Load environment-specific secrets
+      ansible.builtin.include_vars:
+        file: "{{ config_env_path }}/secrets.yml"
+      tags: always
+
+    - name: Load shared configuration
+      ansible.builtin.include_vars:
+        dir: "{{ config_all_path }}"
+      tags: always
+
+    - name: Load environment-specific configuration
+      ansible.builtin.include_vars:
+        dir: "{{ config_env_path }}"
+        ignore_unknown_extensions: true
+        extensions:
+          - yml
+          - yaml
+      tags: always
+
+  roles:
+    # ===== Organizations and Access Control =====
+    - role: infra.aap_configuration.organizations
+      vars:
+        controller_configuration_organizations_secure_logging: true
+      when: controller_organizations is defined
+      tags: [organizations, access, foundation]
+
+    - role: infra.aap_configuration.teams
+      when: controller_teams is defined
+      tags: [teams, access, foundation]
+
+    - role: infra.aap_configuration.users
+      vars:
+        controller_configuration_users_secure_logging: true
+      when: controller_user_accounts is defined
+      tags: [users, access, foundation]
+
+    - role: infra.aap_configuration.roles
+      when: controller_roles is defined
+      tags: [roles, access, foundation]
+
+    # ===== Credentials =====
+    - role: infra.aap_configuration.credential_types
+      when: controller_credential_types is defined
+      tags: [credentials, credential_types]
+
+    - role: infra.aap_configuration.credentials
+      vars:
+        controller_configuration_credentials_secure_logging: true
+      when: controller_credentials is defined
+      tags: [credentials]
+
+    # ===== Execution Environments =====
+    - role: infra.aap_configuration.execution_environments
+      when: controller_execution_environments is defined
+      tags: [execution_environments, ee]
+
+    # ===== Instance Groups =====
+    - role: infra.aap_configuration.instance_groups
+      when: controller_instance_groups is defined
+      tags: [instance_groups, infrastructure]
+
+    # ===== Projects and Inventories =====
+    - role: infra.aap_configuration.projects
+      when: controller_projects is defined
+      tags: [projects, content]
+
+    - role: infra.aap_configuration.inventories
+      when: controller_inventories is defined
+      tags: [inventories, content]
+
+    - role: infra.aap_configuration.inventory_sources
+      when: controller_inventory_sources is defined
+      tags: [inventories, inventory_sources, content]
+
+    - role: infra.aap_configuration.hosts
+      when: controller_hosts is defined
+      tags: [inventories, hosts, content]
+
+    - role: infra.aap_configuration.groups
+      when: controller_groups is defined
+      tags: [inventories, groups, content]
+
+    # ===== Job Templates and Workflows =====
+    - role: infra.aap_configuration.job_templates
+      when: controller_templates is defined
+      tags: [job_templates, templates, automation]
+
+    - role: infra.aap_configuration.workflow_job_templates
+      when: controller_workflows is defined
+      tags: [workflows, templates, automation]
+
+    # ===== Notifications and Schedules =====
+    - role: infra.aap_configuration.notification_templates
+      when: controller_notifications is defined
+      tags: [notifications, integrations]
+
+    - role: infra.aap_configuration.schedules
+      when: controller_schedules is defined
+      tags: [schedules, automation]
+
+    # ===== Applications (OAuth2) =====
+    - role: infra.aap_configuration.applications
+      when: controller_applications is defined
+      tags: [applications, integrations]
+
+    # ===== Labels =====
+    - role: infra.aap_configuration.labels
+      when: controller_labels is defined
+      tags: [labels, metadata]
+
+  post_tasks:
+    - name: Collect configuration statistics
+      ansible.builtin.set_fact:
+        config_stats:
+          environment: "{{ target_environment }}"
+          organizations: "{{ controller_organizations | default([]) | length }}"
+          teams: "{{ controller_teams | default([]) | length }}"
+          users: "{{ controller_user_accounts | default([]) | length }}"
+          credentials: "{{ controller_credentials | default([]) | length }}"
+          projects: "{{ controller_projects | default([]) | length }}"
+          inventories: "{{ controller_inventories | default([]) | length }}"
+          job_templates: "{{ controller_templates | default([]) | length }}"
+          workflows: "{{ controller_workflows | default([]) | length }}"
+          schedules: "{{ controller_schedules | default([]) | length }}"
+
+    - name: Display configuration summary
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          AAP Configuration Complete
+          ========================================
+          Environment: {{ config_stats.environment }}
+
+          Access Control:
+            - Organizations: {{ config_stats.organizations }}
+            - Teams: {{ config_stats.teams }}
+            - Users: {{ config_stats.users }}
+
+          Security:
+            - Credentials: {{ config_stats.credentials }}
+
+          Content:
+            - Projects: {{ config_stats.projects }}
+            - Inventories: {{ config_stats.inventories }}
+
+          Automation:
+            - Job Templates: {{ config_stats.job_templates }}
+            - Workflows: {{ config_stats.workflows }}
+            - Schedules: {{ config_stats.schedules }}
+          ========================================
+
+    - name: Save configuration timestamp
+      ansible.builtin.copy:
+        content: |
+          Environment: {{ target_environment }}
+          Configured: {{ ansible_date_time.iso8601 }}
+          User: {{ lookup('env', 'USER') }}
+        dest: ".last_configured_{{ target_environment }}"
+        mode: '0644'
+      delegate_to: localhost
+
+# Usage:
+# AAP_ENV=dev ansible-playbook playbooks/aap_config.yml
+# AAP_ENV=prod ansible-playbook playbooks/aap_config.yml --tags projects,templates
+# ansible-playbook playbooks/aap_config.yml --check --diff

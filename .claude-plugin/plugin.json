@@ -15,7 +15,8 @@
     "ansible-scaffold-ee",
     "ansible-navigator-config",
     "ansible-eda-rulebook",
-    "ansible-interactive"
+    "ansible-interactive",
+    "aap-config-as-code"
   ],
   "keywords": [
     "ansible",

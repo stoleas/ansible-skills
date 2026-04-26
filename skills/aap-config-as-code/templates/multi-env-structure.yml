@@ -1,0 +1,71 @@
+---
+# Multi-Environment AAP Configuration Structure Template
+# This template shows the recommended directory structure for managing
+# multiple AAP environments (dev, qa, prod) with shared configurations
+
+# Directory Structure:
+# aap-config/
+# ├── ansible.cfg
+# ├── requirements.yml
+# ├── inventory/
+# │   ├── dev.yml
+# │   ├── qa.yml
+# │   └── prod.yml
+# ├── config/
+# │   ├── all/                    # Shared across all environments
+# │   │   ├── organizations.yml
+# │   │   ├── teams.yml
+# │   │   ├── credential_types.yml
+# │   │   └── execution_environments.yml
+# │   ├── dev/
+# │   │   ├── credentials.yml
+# │   │   ├── projects.yml
+# │   │   ├── inventories.yml
+# │   │   ├── job_templates.yml
+# │   │   ├── workflows.yml
+# │   │   └── secrets.yml         # Encrypted with ansible-vault
+# │   ├── qa/
+# │   │   └── (same structure as dev)
+# │   └── prod/
+# │       └── (same structure as dev)
+# └── playbooks/
+#     ├── aap_config.yml
+#     ├── export_config.yml
+#     └── validate_config.yml
+
+# Example: config/all/organizations.yml
+controller_organizations:
+  - name: Engineering
+    description: Engineering teams
+    galaxy_credentials:
+      - Ansible Galaxy
+
+  - name: Operations
+    description: Operations teams
+    max_hosts: 100
+
+# Example: config/dev/projects.yml
+controller_projects:
+  - name: Infrastructure Automation
+    organization: Engineering
+    scm_type: git
+    scm_url: https://github.com/myorg/infra-automation.git
+    scm_branch: develop              # Different branch per environment
+    scm_credential: GitHub Credential
+    scm_update_on_launch: true
+    default_environment: Custom EE
+
+# Example: config/prod/projects.yml
+controller_projects:
+  - name: Infrastructure Automation
+    organization: Engineering
+    scm_type: git
+    scm_url: https://github.com/myorg/infra-automation.git
+    scm_branch: main                  # Production uses main branch
+    scm_credential: GitHub Credential
+    scm_update_on_launch: false       # More controlled in prod
+    default_environment: Custom EE
+
+# Shared components live in config/all/
+# Environment-specific configs in config/{env}/
+# Secrets always encrypted and environment-specific
