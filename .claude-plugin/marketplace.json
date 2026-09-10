@@ -1,5 +1,9 @@
 {
   "name": "ansible-skills-marketplace",
+  "owner": {
+    "name": "stoleas",
+    "url": "https://github.com/stoleas"
+  },
   "version": "1.0.0",
   "description": "Comprehensive Ansible automation skills marketplace following Red Hat Communities of Practice",
   "plugins": [
